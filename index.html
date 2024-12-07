@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>GEOlayers.app Plugin Example</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<style>
+		body {
+			font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+		}
+
+		#plugin {
+			width: 550px;
+			height: 620px;
+		}
+
+		#exports {
+			display: flex;
+			overflow-x: auto;
+			height: 10rem;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>GEOlayers.app Plugin Example</h1>
+	<h2>Methods</h2>
+	<p>
+		The Plugin API exposes a couple of functions, such as <code>alert</code> and <code>confirm</code> to show
+		dialogs inside the geolayers ui. If you don't need the plugin anymore dispose it with its
+		<code>remove</code> method.
+	</p>
+	<div>
+		<!-- Buttons to trigger plugin methods -->
+		<button id="testbtn1" disabled>Alert in Plugin</button>
+		<button id="testbtn2" disabled>Confirm in Plugin</button>
+		<button id="testbtn3" disabled>Remove Plugin</button>
+	</div>
+	<h2>Plugin</h2>
+	<p>
+		The Plugin is instantiated with the <code>createPlugin</code> function. It takes a DOM element as first argument
+		and an options object as second one. The second one
+		most importantly defines what formats the plugin can render and what it can do with already rendered exports.
+		In this Example a single onExport function is registered that appends the geolayers export to the document.
+	</p>
+	<div id="plugin">
+		<!-- This is the place where the plugin will be inserted -->
+	</div>
+	<h2>Exports</h2>
+	<p>The Plugin can register onExport callbacks that allow you to receive renders and exports of the logged in user.
+	</p>
+	<div id="exports">
+		<!-- Plugin Exports are appended here -->
+	</div>
+
+	<!-- This script exposes "geolayers" as a global -->
+	<script src="https://editor.geolayers.app/plugin-sdk/v1/plugin-sdk.umd.js"></script>
+
+	<script>
+		// Initialize the plugin
+		const plugin = geolayers.createPlugin(document.getElementById("plugin"), {
+			onInit: () => {
+				// Enable buttons when plugin is initialized and a user is logged in
+				["testbtn1", "testbtn2", "testbtn3"].forEach((id) => {
+					document.getElementById(id).removeAttribute("disabled");
+				});
+			},
+			pluginExportActions: [
+				{
+					name: "Export to Host",
+					icon: "plus",
+					onExport,
+				},
+			],
+			pluginRenderPresets: [
+				{
+					name: "MP4",
+					renderSettings: {
+						resolution: [960, 540],
+						frameRate: 25,
+						exportType: "mp4",
+						customProperties: {
+							myProperty: "myValue",
+						},
+					},
+					onExport,
+				},
+				{
+					name: "PNG",
+					renderSettings: {
+						resolution: [960, 960],
+						exportType: "png",
+						customProperties: {
+							myProperty: "myValue2",
+						},
+					},
+					onExport,
+				},
+			],
+		});
+
+		// Function to handle exports
+		function onExport(blob, { customProperties }) {
+			console.log("GEOlayers Export received, append to document", blob, customProperties);
+			const elType = blob.type.includes("video") ? "video" : "img";
+			const el = document.createElement(elType);
+			el.src = URL.createObjectURL(blob);
+			if (elType === "video") el.controls = true;
+			document.getElementById("exports").appendChild(el);
+		}
+
+		// Event listener for alert button
+		document.getElementById("testbtn1").addEventListener("click", () => {
+			plugin.alert({ title: "Hello", text: "Hello from the host window", confirmBtnText: "Hello Back!" }).then(console.log);
+		});
+
+		// Event listener for confirm button
+		document.getElementById("testbtn2").addEventListener("click", () => {
+			plugin
+				.confirm({
+					title: "Hello",
+					text: "The confirm() Promise resolve to True or False depending on what you clicked",
+					confirmBtnText: "True",
+					cancelBtnText: "False",
+				})
+				.then(console.log);
+		});
+
+		// Event listener for remove button
+		document.getElementById("testbtn3").addEventListener("click", () => {
+			plugin.remove();
+		});
+
+	</script>
+</body>
+
+</html>
