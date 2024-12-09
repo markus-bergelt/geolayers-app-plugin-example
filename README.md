@@ -3,6 +3,7 @@
 [GEOlayers.app](https://editor.geolayers.app) allows you to create rich map animations directly in your browser. A geolayers.app plugin can be used in a browser-like environment to render and export images and videos of your animations. It can be integrated into content management systems or other creative applications like Adobe Premiere or Photoshop to streamline workflows.
 
 ## Getting Started
+
 Embed the plugin SDK script in your website:
 
     <script src="https://editor.geolayers.app/plugin-sdk/v1/plugin-sdk.umd.js"></script>
