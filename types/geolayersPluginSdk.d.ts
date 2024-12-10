@@ -99,7 +99,7 @@ export interface AlertOptions {
 	/** Dialog message content */
 	text: string;
 	/** Text for the confirmation button */
-	confirmBtnText: string;
+	confirmBtnText?: string;
 }
 
 /** Configuration options for confirmation dialogs */
@@ -109,7 +109,7 @@ export interface ConfirmOptions {
 	/** Dialog message content */
 	text: string;
 	/** Text for the confirmation button */
-	confirmBtnText: string;
+	confirmBtnText?: string;
 	/** Text for the cancel button */
-	cancelBtnText: string;
+	cancelBtnText?: string;
 }
