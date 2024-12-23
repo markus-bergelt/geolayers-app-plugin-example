@@ -12,9 +12,11 @@ export interface CreatePluginOptions {
 	pluginExportActions?: PluginExportAction[];
 	/** Array of predefined render settings presets */
 	pluginRenderPresets?: PluginRenderPreset[];
-	/** Custom window creation handler for plugin content */
+	/** Theme for the Plugins UI */
+	theme?: UiTheme;
+	/** Custom window creation handler for plugin content. */
 	createContentWindow?: (container: HTMLElement, src: string) => [Window, () => void];
-	/** Gets callen when the user opens an external link from within the plugin */
+	/**Is called when the user opens an external link from within the plugin */
 	openExternalLink?: (url: string) => Promise<void>;
 	/** Source URL for the plugin */
 	url?: string;
@@ -22,6 +24,8 @@ export interface CreatePluginOptions {
 
 /** Main plugin interface providing core functionality and methods */
 export interface GeolayersPlugin {
+	/** SDK version number */
+	version: string;
 	/** Displays an alert dialog with the specified options
 	 * @param options Configuration for the alert dialog
 	 * @returns Promise that resolves when the alert is closed
@@ -40,6 +44,10 @@ export interface GeolayersPlugin {
 	 * @param presets Array of render presets to set
 	 */
 	setPluginRenderPresets(presets: PluginRenderPreset[]): Promise<void>;
+	/** Updates UI Theme of the plugin
+	 * @param theme UI Theme to set
+	 */
+	setTheme(theme: UiTheme): Promise<void>;
 	/** Removes the plugin instance and cleans up resources */
 	remove(): void;
 }
@@ -83,7 +91,7 @@ export interface RenderSettings {
 	/** Target frame rate for video exports */
 	frameRate?: number;
 	/** Output format type */
-	exportType: "mp4" | "png";
+	exportType: "mp4" | "png" | "imageData";
 	/** Export quality (0-1) */
 	quality?: number;
 	/** Scaling factor for render resolution */
@@ -91,6 +99,25 @@ export interface RenderSettings {
 	/** Additional custom rendering properties */
 	customProperties?: { [key: string]: string | number | boolean };
 }
+
+/** Theme for the Plugins UI */
+export type UiTheme =
+	| {
+			/** Background Color as CSS String */
+			bgColor: string;
+			/** Text Color as CSS String */
+			textColor?: string;
+			/** Primary Color as CSS String */
+			primaryColor?: string;
+			/** Danger Color as CSS String, Usually red */
+			dangerColor?: string;
+			/** Warning Color as CSS String, Usually yellow */
+			warningColor?: string;
+			/** Success Color as CSS String, Usually green */
+			successColor?: string;
+	  }
+	| "light"
+	| "dark";
 
 /** Configuration options for alert dialogs */
 export interface AlertOptions {
