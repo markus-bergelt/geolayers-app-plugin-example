@@ -6,17 +6,21 @@ export interface GeolayersPluginSdk {
 
 /** Configuration options for initializing a new plugin instance */
 export interface CreatePluginOptions {
-	/** Callback function executed after plugin is initialized and a user is logged in. Can rerun when a new user logs in.*/
+	/** Callback function executed after plugin is initialized.*/
 	onInit?: () => void;
+	/** Callback function executed when the logged in user changes.*/
+	onUserChange?: (user: User | null) => void;
 	/** Array of custom export actions available to the plugin */
 	pluginExportActions?: PluginExportAction[];
 	/** Array of predefined render settings presets */
 	pluginRenderPresets?: PluginRenderPreset[];
-	/** Theme for the Plugins UI */
+	/** Theme for the Plugin UI */
 	theme?: UiTheme;
-	/** Custom window creation handler for plugin content. */
+	/** Options for the embedded user login */
+	loginOptions?: LoginOptions;
+	/** Custom window creation handler for plugin content */
 	createContentWindow?: (container: HTMLElement, src: string) => [Window, () => void];
-	/**Is called when the user opens an external link from within the plugin */
+	/** Gets callen when the user opens an external link from within the plugin */
 	openExternalLink?: (url: string) => Promise<void>;
 	/** Source URL for the plugin */
 	url?: string;
@@ -100,6 +104,14 @@ export interface RenderSettings {
 	customProperties?: { [key: string]: string | number | boolean };
 }
 
+/** User of the plugin */
+export type User = {
+	/** User Name */
+	displayName: string;
+	/** User email */
+	email: string;
+};
+
 /** Theme for the Plugins UI */
 export type UiTheme =
 	| {
@@ -118,6 +130,14 @@ export type UiTheme =
 	  }
 	| "light"
 	| "dark";
+
+/** Configuration options for handling user login */
+export interface LoginOptions {
+	/** Allow Login with Email and Password or Sign In link. */
+	allowEmailLogin?: boolean;
+	/** Allow Login with Google. Some Webviews might not be able to handle the OAuth flow. */
+	allowGoogleLogin?: boolean;
+}
 
 /** Configuration options for alert dialogs */
 export interface AlertOptions {

@@ -61,11 +61,12 @@
 			const plugin = geolayers.createPlugin(document.getElementById("plugin"), {
 				theme: "light",
 				onInit: () => {
-					// Enable buttons when plugin is initialized and a user is logged in
+					// Enable buttons when plugin is initialized
 					["testbtn1", "testbtn2", "testbtn3"].forEach((id) => {
 						document.getElementById(id).removeAttribute("disabled");
 					});
 				},
+				onUserChange: (user) => console.log("Plugin User changed", user),
 				pluginExportActions: [
 					{
 						name: "Export to Host",
