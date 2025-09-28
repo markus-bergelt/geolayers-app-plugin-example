@@ -7,9 +7,11 @@ export interface GeolayersPluginSdk {
 /** Configuration options for initializing a new plugin instance */
 export interface CreatePluginOptions {
 	/** Callback function executed after plugin is initialized.*/
-	onInit?: () => void;
+	onInit?: (browserSupport: BrowserSupport) => void;
 	/** Callback function executed when the logged in user changes.*/
 	onUserChange?: (user: User | null) => void;
+	/** Callback function executed when the plugin disconnects due to some Error.*/
+	onDisconnect?: () => void;
 	/** Array of custom export actions available to the plugin */
 	pluginExportActions?: PluginExportAction[];
 	/** Array of predefined render settings presets */
@@ -21,7 +23,7 @@ export interface CreatePluginOptions {
 	/** Custom window creation handler for plugin content */
 	createContentWindow?: (container: HTMLElement, src: string) => [Window, () => void];
 	/** Gets callen when the user opens an external link from within the plugin */
-	openExternalLink?: (url: string) => Promise<void>;
+	openExternalLink?: (url: string) => any;
 	/** Source URL for the plugin */
 	url?: string;
 }
@@ -77,11 +79,27 @@ export interface PluginRenderPreset {
 	icon?: string;
 	/** Render configuration settings */
 	renderSettings: RenderSettings;
-	/** Optional handler for export completion
-	 * @param blob The exported data blob
-	 * @param details Additional export details
+	/** Render Lifecycle Hook for when the render is started
+	 * @param details Export details
 	 */
-	onExport?: (blob: Blob, details: any) => void;
+	onStart?: (details: RenderJobDetails) => void;
+	/** Handler for export progress updates
+	 * @param progress The current render progress
+	 */
+	onProgress?: (progress: Progress, details: RenderJobDetails) => void;
+	/** Render Lifecycle Hook for when the render is finished
+	 * @param blob The exported data blob
+	 * @param details Export details
+	 */
+	onExport?: (blob: Blob, details: RenderJobDetails) => void;
+	/** Render Lifecycle Hook for when the render is finished
+	 * @param details Export details
+	 */
+	onFinish?: (details: RenderJobDetails) => void;
+	/** Render Lifecycle Hook for when the render errors
+	 * @param errorMessage Reason for the error
+	 */
+	onError?: (errorMessage: string, details: RenderJobDetails) => void;
 }
 
 /** Configuration options for rendering */
@@ -95,15 +113,38 @@ export interface RenderSettings {
 	/** Target frame rate for video exports */
 	frameRate?: number;
 	/** Output format type */
-	exportType: "mp4" | "png" | "imageData";
+	exportType: "mp4" | "png" | "imageData" | "imageDataLayers";
 	/** Export quality (0-1) */
 	quality?: number;
 	/** Scaling factor for render resolution */
 	resolutionRenderFactor?: number;
 	/** Additional custom rendering properties */
-	customProperties?: { [key: string]: string | number | boolean };
+	customProperties?: CustomProperties;
 }
 
+/** Render Job Custom Properties */
+export type CustomProperties = { [key: string]: string | number | boolean | null };
+
+/** Render Job Details */
+export type RenderJobDetails = {
+	/** Job ID */
+	renderJobId: string;
+	/** Name of the rendered File */
+	fileName: string;
+	/** timeline start time in seconds */
+	startTime: number;
+	/** timeline end time in seconds */
+	endTime: number;
+	/** Additional custom rendering properties */
+	customProperties?: CustomProperties;
+};
+/** Task Progress */
+export type Progress = {
+	/** Task completion in percent */
+	percentage: number;
+	/** Task description */
+	description: string;
+};
 /** User of the plugin */
 export type User = {
 	/** User Name */
@@ -160,3 +201,50 @@ export interface ConfirmOptions {
 	/** Text for the cancel button */
 	cancelBtnText?: string;
 }
+
+/** Browser support information */
+export type BrowserSupport = {
+	/** Whether the browser is fully supported */
+	fullSupport: boolean;
+	/** Deatils which features are supported */
+	details: BrowserSupportDetails;
+};
+
+/** Browser support details */
+export type BrowserSupportDetails = {
+	/** Whether the browser can access local files */
+	fileSystemAccess: boolean;
+	/** Whether the browser use AudioContext apis */
+	audioProcessing: boolean;
+	/** Whether the browser can access local fonts */
+	localFonts: boolean;
+	/** Whether the browser can access the clipboard */
+	clipboardAccess: boolean;
+	/** Whether the browser can share files */
+	sharing: boolean;
+	/** Whether the browser can access the geolocation */
+	geoposition: boolean;
+	/** Whether the browser can render certain file formats */
+	rendering: {
+		mp4: {
+			video: boolean;
+			audio: boolean;
+		};
+		webm: {
+			video: boolean;
+			audio: boolean;
+		};
+		png: {
+			video: boolean;
+		};
+		jpg: {
+			video: boolean;
+		};
+		gif: {
+			video: boolean;
+		};
+		wav: {
+			audio: boolean;
+		};
+	};
+};
