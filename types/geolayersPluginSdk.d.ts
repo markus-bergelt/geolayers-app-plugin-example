@@ -113,7 +113,7 @@ export interface RenderSettings {
 	/** Target frame rate for video exports */
 	frameRate?: number;
 	/** Output format type */
-	exportType: "mp4" | "png" | "imageData" | "imageDataLayers";
+	exportType: "mp4" | "mov" | "png" | "imageData" | "imageDataLayers";
 	/** Export quality (0-1) */
 	quality?: number;
 	/** Scaling factor for render resolution */
@@ -174,8 +174,10 @@ export type UiTheme =
 
 /** Configuration options for handling user login */
 export interface LoginOptions {
-	/** Allow Login with Email and Password or Sign In link. */
+	/** Allow Login with Email and Password. */
 	allowEmailLogin?: boolean;
+	/** Allow Login with Sign In link. */
+	allowSignInLinks?: boolean;
 	/** Allow Login with Google. Some Webviews might not be able to handle the OAuth flow. */
 	allowGoogleLogin?: boolean;
 }
@@ -227,6 +229,10 @@ export type BrowserSupportDetails = {
 	/** Whether the browser can render certain file formats */
 	rendering: {
 		mp4: {
+			video: boolean;
+			audio: boolean;
+		};
+		mov: {
 			video: boolean;
 			audio: boolean;
 		};
