@@ -23,7 +23,7 @@ export interface CreatePluginOptions {
 	/** Custom window creation handler for plugin content */
 	createContentWindow?: (container: HTMLElement, src: string) => [Window, () => void];
 	/** Gets callen when the user opens an external link from within the plugin */
-	openExternalLink?: (url: string) => any;
+	openExternalLink?: (url: string, message: string) => any;
 	/** Source URL for the plugin */
 	url?: string;
 }
@@ -113,7 +113,7 @@ export interface RenderSettings {
 	/** Target frame rate for video exports */
 	frameRate?: number;
 	/** Output format type */
-	exportType: "mp4" | "mov" | "png" | "imageData" | "imageDataLayers";
+	exportType: "mp4" | "mov" | "png" | "pngLayers" | "imageData" | "imageDataLayers";
 	/** Export quality (0-1) */
 	quality?: number;
 	/** Scaling factor for render resolution */
